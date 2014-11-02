@@ -85,7 +85,7 @@ func Listen(port int, handler ServerHandler) (*Server, error) {
         Port        : port,
         listener    : ln,
         stopped     : false,
-        maxConns    : 2,
+        maxConns    : 100, // TODO options
         conns       : make(map[*serverConn]struct{}),
         handler     : handler,
     }
