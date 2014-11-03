@@ -1,44 +1,49 @@
 package main
 
 import (
-    "fmt"
-    "protogo"
-    "protogo/telnet"
+	"log"
+	"os"
+	"os/signal"
+
+	"protogo"
+	"protogo/telnet"
 )
 
 func main() {
+	log.Printf("Start echo server.\n")
 
-    fmt.Printf("Start echo server.\n")
+	// Binds SIGTERM signal on this channel
+	closeChannel := make(chan os.Signal, 1)
+	signal.Notify(closeChannel, os.Interrupt)
 
-    server,err := protogo.Listen(8100, telnet.NewServer(welcome))
-    if err != nil {
-        fmt.Println("Unable to start the server %s", err);
-        return
-    }
+	server, err := protogo.Listen(8100, telnet.NewServer(welcome))
+	if err != nil {
+		log.Fatalf("Unable to start the server : %s", err.Error())
+	}
 
-    defer server.Stop()
+	defer server.Stop()
 
-    // Server CONNECTED !!
-    fmt.Printf("Server Connected on %s\n", server.Address)
+	// Server CONNECTED !!
+	log.Printf("Server Connected on %s\n", server.Address)
 
-    // FIXME how to not wait for an input !?
-    fmt.Println("Type a key to quit ...")
-    fmt.Scanln()
-    fmt.Println("Stopped")
+	log.Println("Ctrl-C/SIGTERM to quit.")
+	<-closeChannel
 }
 
-// -----------------------------------> 
+// ----------------------------------->
 
 func welcome() (telnet.Response, telnet.EventHandler) {
-    return telnet.NewLineResponse("Welcome!!!", telnet.REQUEST), telnet.EventHandlerFrom(echo, nil)
+	return telnet.NewLineResponse("Welcome!!!", telnet.REQUEST), telnet.EventHandlerFrom(echo, nil)
 }
 
 func echo(line telnet.Line) telnet.Response {
 
-    switch(line.AsCommand().Name) {
-        case "" : return telnet.NewLineResponse("Please, say something!", telnet.REQUEST)
-        case "quit", "exit", "bye" : return telnet.NewLineResponse("Bye!", telnet.QUIT)
-    }
+	switch line.AsCommand().Name {
+	case "":
+		return telnet.NewLineResponse("Please, say something!", telnet.REQUEST)
+	case "quit", "exit", "bye":
+		return telnet.NewLineResponse("Bye!", telnet.QUIT)
+	}
 
-    return telnet.NewLineResponse("You just said: " + line.Value, telnet.REQUEST)
+	return telnet.NewLineResponse("You just said: "+line.Value, telnet.REQUEST)
 }
