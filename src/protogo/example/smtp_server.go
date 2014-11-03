@@ -39,7 +39,6 @@ func main() {
 // The current Mail, and the telnet EventHandler
 // Each property defined the current step
 type Mail struct {
-
 	// who created sayed HELO
 	who string
 	// once we start the Mail, the from address
@@ -47,15 +46,14 @@ type Mail struct {
 	// the list of MAIL recipients
 	recipients []string
 	// the MAIL content
-	content *bytes.Buffer
+	content bytes.Buffer
 }
 
 // Accept the connection
 func welcome() (telnet.Response, telnet.EventHandler) {
-
-	mail := &Mail{content: bytes.NewBufferString("")}
-	// we start with a REQUEST
-	return response(220, "Welcome, SMTP Ready", telnet.REQUEST), mail
+    mail := &Mail{}
+    // we start with a REQUEST
+    return response(220, "Welcome, SMTP Ready", telnet.REQUEST), mail
 }
 
 // receive a command line as request
