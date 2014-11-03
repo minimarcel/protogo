@@ -44,13 +44,13 @@ type Mail struct {
     // the list of MAIL recipients
     recipients []string
     // the MAIL content
-    content *bytes.Buffer
+    content bytes.Buffer
 }
 
 // Accept the connection
 func welcome() (telnet.Response,telnet.EventHandler) {
 
-    mail := &Mail{content:bytes.NewBufferString("")}
+    mail := &Mail{}
     // we start with a REQUEST
     return response(220, "Welcome, SMTP Ready", telnet.REQUEST), mail
 }
