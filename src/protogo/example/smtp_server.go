@@ -51,9 +51,9 @@ type Mail struct {
 
 // Accept the connection
 func welcome() (telnet.Response, telnet.EventHandler) {
-    mail := &Mail{}
-    // we start with a REQUEST
-    return response(220, "Welcome, SMTP Ready", telnet.REQUEST), mail
+	mail := &Mail{}
+	// we start with a REQUEST
+	return response(220, "Welcome, SMTP Ready", telnet.REQUEST), mail
 }
 
 // receive a command line as request
