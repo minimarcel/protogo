@@ -50,9 +50,8 @@ type Mail struct {
 // Accept the connection
 func welcome() (telnet.Response,telnet.EventHandler) {
 
-    // init the mail state
     mail := &Mail{content:bytes.NewBufferString("")}
-    // jump to the helo state
+    // we start with a REQUEST
     return response(220, "Welcome, SMTP Ready", telnet.REQUEST), mail
 }
 
@@ -62,7 +61,7 @@ func (m *Mail) OnRequest(line telnet.Line) telnet.Response {
     // first we parse the command line
     cmd := parseCmd(line)
 
-    // handle common lines
+    // handle common cmds
     switch(cmd.t) {
         case QUIT       : return quit()
         case NOOP       : return ok("Ok")
@@ -107,7 +106,7 @@ func (m *Mail) OnData(req *telnet.Request) telnet.Response {
             return unavailable()
         }
 
-        // end ??
+        // the end ??
         if line.Value == "." {
             m.send()
             m.reset()
@@ -181,7 +180,7 @@ func (m *Mail) mailStep(cmd *cmdLine) telnet.Response {
         case cmd.Command.Args[0] != "FROM:" : return syntaxError("FROM: was expected as first argument")
     }
 
-    // TODO parse the mail
+    // TODO parse the email address
     m.from = cmd.Command.Args[1]
 
     return ok("Sender ok : " + m.from)
@@ -221,7 +220,7 @@ func (m *Mail) rcptStep(cmd *cmdLine) telnet.Response {
         case cmd.Command.Args[0] != "TO:"   : return syntaxError("TO: was expected as first argument")
     }
 
-    // TODO parse the mail
+    // TODO parse the email address
     recipient := cmd.Command.Args[1]
     m.recipients = append(m.recipients, recipient)
 
@@ -274,6 +273,10 @@ func parseCmd(line telnet.Line) *cmdLine {
 // -----------------------------------> 
 // Responses
 
+// an smtp response, including a code
+// 2xx - ok 
+// 3xx - continue 
+// 5xx - error
 type smtpResponse struct {
     // the line code
     *telnet.LineResponse
