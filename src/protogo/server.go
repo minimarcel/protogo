@@ -17,9 +17,8 @@ type ServerHandler interface {
     //
     // Will be invoked when a connection has been accepted
     //
-    // @param   type    the message type
-    // @param   reader  the message reader
-    OnAccepted(conn net.Conn)
+    // @param   conn    the newly opened connection
+    OnAccepted(net.Conn)
 }
 
 // the protogo Server
