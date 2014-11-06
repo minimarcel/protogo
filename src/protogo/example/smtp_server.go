@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	log.Printf("Start echo server.\n")
+	log.Printf("Starting smtp server.\n")
 
 	// Binds SIGTERM signal on this channel
 	closeChannel := make(chan os.Signal, 1)
@@ -25,7 +25,10 @@ func main() {
 		log.Fatalf("Unable to start the server : %s\n", err.Error())
 	}
 
-	defer server.Stop()
+	defer func() {
+		log.Printf("Stopping smtp server.\n")
+		server.Stop()
+	}()
 
 	// Server CONNECTED !!
 	log.Printf("Server Connected on %s\n", server.Address)
